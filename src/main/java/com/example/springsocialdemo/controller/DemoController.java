@@ -1,6 +1,8 @@
 package com.example.springsocialdemo.controller;
 
 import com.example.springsocialdemo.service.TwitterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +12,8 @@ public class DemoController {
 
     @Autowired
     TwitterService twitterService;
+
+    private static Logger LOOGER = LoggerFactory.getLogger(DemoController.class);
 
     @GetMapping("/postTweet")
     public void postTweet() throws InterruptedException {
@@ -25,9 +29,14 @@ public class DemoController {
                 "par le chant de l’ocarina du Temps pour accéder à... ",
                 "Excalibur, l’épée suprême pouvant repousser les forces des ténèbres."
         };
-        for (int i=0; i<tweets.length; i++) {
-            twitterService.postTweet(tweets[i]);
+        for (int i = 0; i < tweets.length; i++) {
+            LOOGER.info("Tweet posted : " + twitterService.postTweet(tweets[i]));
             Thread.sleep(2400000); // 40 min
         }
+    }
+
+    @GetMapping("/testRecupTweet")
+    public String testRecupTweet(@RequestParam String screen_name) {
+        return twitterService.recupTweet(screen_name);
     }
 }
