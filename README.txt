@@ -21,3 +21,4 @@
 Optionnal :
 5) You can also deploy this on an Heroku-like app and call TwitterService.parseTweets() every couple hours for example
     You can also use Kaffeine (https://kaffeine.herokuapp.com/#!) to ping your Heroku app so it doesn't go to sleep.
+
