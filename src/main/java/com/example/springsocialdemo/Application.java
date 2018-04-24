@@ -7,9 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
 
 	public static void main(String[] args) {
+
+
 		// Proxy
-		System.setProperty("http.proxyPort", ""); // TODO Proxy port
-        System.setProperty("http.proxyHost", ""); // TODO Proxy host
+		System.setProperty("http.proxyPort", "<port>"); //TODO set proxy configuration
+        System.setProperty("http.proxyHost", "<host>");
 
         // Authentification
 //		final String proxyUser = System.getProperty("http.proxyUser");

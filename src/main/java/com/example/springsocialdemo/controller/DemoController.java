@@ -11,32 +11,29 @@ import org.springframework.web.bind.annotation.*;
 public class DemoController {
 
     @Autowired
-    TwitterService twitterService;
+    private TwitterService twitterService;
 
     private static Logger LOOGER = LoggerFactory.getLogger(DemoController.class);
 
     @GetMapping("/postTweet")
     public void postTweet() throws InterruptedException {
         final String[] tweets = {
-                "Le jeune Link vit paisiblement dans la forêt Kokiri",
-                "Avec l’arbre Mojo jusqu’au jour où Ghoma s’infiltre dans la forêt et pénètre dans l’arbre Mojo.",
-                "Celui-ci demande à Navi d’aller réveiller Link.",
-                "Plus tard, avec l’aide de Mido, Link arrive à vaincre Ghoma.",
-                "L’arbre Mojo lui remet l’émeraude Kokiri",
-                "Et lui demande de la donner à la princesse Zelda.",
-                "Cette dernière lui demande de partir en quête du rubis Goron et du saphir Zora",
-                "ces pierres doivent être amenées au temple du Temps et doivent être réveillées",
-                "par le chant de l’ocarina du Temps pour accéder à... ",
-                "Excalibur, l’épée suprême pouvant repousser les forces des ténèbres."
+                 "The path of the righteous man is beset on all sides by the inequities of the selfish and the tyranny of evil men.",
+                 "Blessed is he who, in the name of charity and good will, shepherds the weak through the valley of the darkness.",
+                 "For he is truly his brother's keeper and the finder of lost children.",
+                 "And I will strike down upon thee with great vengeance and furious anger",
+                 "those who attempt to poison and destroy my brothers.",
+                 "And you will know my name is the Lord when I lay my vengeance upon you."
         };
+
         for (int i = 0; i < tweets.length; i++) {
             LOOGER.info("Tweet posted : " + twitterService.postTweet(tweets[i]));
-            Thread.sleep(2400000); // 40 min
+            Thread.sleep(1200000); // 40 min
         }
     }
 
-    @GetMapping("/testRecupTweet")
-    public String testRecupTweet(@RequestParam String screen_name) {
-        return twitterService.recupTweet(screen_name);
+    @GetMapping("/parseTweets")
+    public String parseTweets(@RequestParam String screen_name) {
+        return twitterService.parseTweets(screen_name);
     }
 }

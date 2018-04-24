@@ -1,49 +1,52 @@
 package com.example.springsocialdemo.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.social.OperationNotPermittedException;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.Twitter;
-import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class TwitterService {
 
-    @Value("${twitter.consumer.key}")
-    private String consumerKey;
-    @Value("${twitter.consumer.secret}")
-    private String consumerSecret;
+    @Autowired
+    private Twitter twitter;
 
-    @Value("${twitter.access.token}")
-    private String accessToken;
-
-    @Value("${twitter.access.token.secret}")
-    private String accessTokenSecret;
-
+    /**
+     * Post {@param status} to twitter
+     * {@param status} has to be 140 character max
+     * @param status
+     * @return tweet id
+     */
     public String postTweet(String status) {
-        Twitter twitter = new TwitterTemplate(consumerKey, consumerSecret, accessToken, accessTokenSecret);
         return twitter.timelineOperations().updateStatus(status).getIdStr();
     }
 
     /**
-     * Récupère les 20 derniers tweets de {@param screenName} puis teste si les tweets
-     * de la dernière heure contienne les mots concours et retweet, si oui retweete le message.
+     * Get the last 20 tweets of {@param screenName} then test whether the tweets
+     * contains the words "concours" and "retweet" (French), if yes retweet the tweet.
+     * Also test the word "follow", if yes follow the user.
      * @param screenName
-     * @return l'identifiant du retweet tweeté, ainsi qu'un tableau contenant les 20 derniers tweets.
+     * @return id of retweet, and a table of the 20 last tweets
      */
-    public String recupTweet(String screenName){
-        Twitter twitter = new TwitterTemplate(consumerKey, consumerSecret, accessToken, accessTokenSecret);
+    public String parseTweets(String screenName) {
         StringBuilder str = new StringBuilder();
         List<Tweet> timeline = twitter.timelineOperations().getUserTimeline(screenName);
         for (Tweet t : timeline) {
-            if (!t.getCreatedAt().before(new Date(System.currentTimeMillis() - 3600000))
-                    && !t.isRetweet()
-                    && (t.getText().contains("concours") || t.getText().contains("Concours"))
-                    && (t.getText().contains("RT") || t.getText().contains("RETWEET"))) {
-                str.append("Tweet => " + twitter.timelineOperations().retweet(t.getId()));
+            String textTweet = t.getText().toLowerCase();
+            if ((textTweet.contains("concours")) && //TODO externalize words & traduction
+                    (textTweet.contains("rt") || textTweet.contains("retweet"))) {
+                try {
+                    long id = twitter.timelineOperations().retweet(t.getId()).getId();
+                    str.append("Retweet concours => " + id);
+                }catch (OperationNotPermittedException e){ // If the tweet has already been retweeted
+                    e.printStackTrace();
+                }
+            }
+            if(textTweet.contains("follow")){
+                twitter.friendOperations().follow(getScreenNameToFollow(t));
             }
         }
 
@@ -59,6 +62,28 @@ public class TwitterService {
         }
         str.append("</tbody></table>");
         return str.toString();
+    }
+
+    /**
+     * Parse the {@param tweet} looking for "follow" then get the word following, minus the first
+     * character, supposedly a "@"
+     * @param tweet
+     * @return String screen_name to follow on twitter
+     */
+    private String getScreenNameToFollow(Tweet tweet){
+        String[] tweetTab = tweet.getText().toLowerCase().split(" ");
+        String result = "";
+        boolean follow = false, boucle = true;
+        int i = 0, length = tweetTab.length;
+        while(i<length && boucle){
+            if(follow) {
+                result = tweetTab[i].substring(1);
+                boucle = false;
+            }
+            if(tweetTab[i].equals("follow")) follow = true;
+            i++;
+        }
+        return result;
     }
 }
 

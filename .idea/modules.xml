@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/gs-accessing-twitter.iml" filepath="$PROJECT_DIR$/gs-accessing-twitter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/twitterBotTweet.iml" filepath="$PROJECT_DIR$/twitterBotTweet.iml" />
     </modules>
   </component>
 </project>
